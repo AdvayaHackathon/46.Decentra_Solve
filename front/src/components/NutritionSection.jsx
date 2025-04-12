@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const nutritionData = {
   first: {
@@ -135,24 +136,118 @@ const foodsToAvoid = [
 
 const NutritionSection = () => {
   const [selectedTrimester, setSelectedTrimester] = useState('first');
+  const [hoveredCategory, setHoveredCategory] = useState(null);
   const { recommended } = nutritionData[selectedTrimester];
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 100, 
+        damping: 12 
+      }
+    },
+    hover: { 
+      y: -10,
+      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      transition: { 
+        type: "spring", 
+        stiffness: 400, 
+        damping: 10 
+      }
+    }
+  };
+
+  const imageVariants = {
+    hover: { 
+      scale: 1.05,
+      transition: { duration: 0.3 }
+    }
+  };
+
+  const tagVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: (i) => ({ 
+      scale: 1, 
+      opacity: 1,
+      transition: { 
+        delay: i * 0.05,
+        type: "spring", 
+        stiffness: 300, 
+        damping: 10 
+      }
+    }),
+    hover: { 
+      y: -5,
+      backgroundColor: "#FEE2E2", // Lighter rose color
+      transition: { 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 10 
+      }
+    }
+  };
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 100 
+      }
+    }
+  };
+
+  const buttonVariants = {
+    hover: { 
+      scale: 1.05,
+      transition: { 
+        type: "spring", 
+        stiffness: 400, 
+        damping: 10 
+      }
+    },
+    tap: { scale: 0.95 }
+  };
+
   return (
-    <div id="nutrition" className="py-24 bg-white">
+    <div id="nutrition" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+        <motion.div 
+          className="text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={titleVariants}
+        >
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
             Pregnancy Nutrition Guide
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
             Essential nutrients for a healthy pregnancy and baby development.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-12">
-          <div className="flex justify-center space-x-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
             {['first', 'second', 'third'].map((trimester, index) => (
-              <button
+              <motion.button
                 key={trimester}
                 onClick={() => setSelectedTrimester(trimester)}
                 className={`px-6 py-2 rounded-full text-sm font-medium ${
@@ -160,72 +255,172 @@ const NutritionSection = () => {
                     ? 'bg-rose-500 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
               >
                 {`Trimester ${index + 1} (${trimester.charAt(0).toUpperCase() + trimester.slice(1)})`}
-              </button>
+              </motion.button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            key={selectedTrimester}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div 
+              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={containerVariants}
+            >
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">✅ Recommended Foods</h3>
+                <motion.h3 
+                  className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
+                  variants={titleVariants}
+                >
+                  <motion.span 
+                    className="text-2xl mr-2"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: [0, 15, 0, 15, 0] }}
+                    transition={{ duration: 1.5, delay: 0.5, repeat: Infinity, repeatDelay: 5 }}
+                  >
+                    ✅
+                  </motion.span>
+                  Recommended Foods
+                </motion.h3>
                 <div className="space-y-6">
-                  {recommended.map((category) => (
-                    <div key={category.category} className="bg-gray-50 rounded-lg overflow-hidden">
-                      <img
-                        src={category.image}
-                        alt={`${category.category} - recommended foods`}
-                        className="w-full h-48 object-cover"
-                      />
+                  {recommended.map((category, categoryIndex) => (
+                    <motion.div 
+                      key={category.category} 
+                      className="bg-gray-50 rounded-lg overflow-hidden"
+                      variants={cardVariants}
+                      whileHover="hover"
+                      onHoverStart={() => setHoveredCategory(`rec-${categoryIndex}`)}
+                      onHoverEnd={() => setHoveredCategory(null)}
+                    >
+                      <div className="overflow-hidden">
+                        <motion.img
+                          src={category.image}
+                          alt={`${category.category} - recommended foods`}
+                          className="w-full h-48 object-cover"
+                          variants={imageVariants}
+                          whileHover="hover"
+                        />
+                      </div>
                       <div className="p-4">
                         <h4 className="text-lg font-semibold text-gray-900">{category.category}</h4>
                         <div className="mt-2">
                           <div className="flex flex-wrap gap-2 mb-2">
-                            {category.items.map((item) => (
-                              <span
+                            {category.items.map((item, i) => (
+                              <motion.span
                                 key={item}
                                 className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium break-words bg-rose-100 text-rose-800"
+                                custom={i}
+                                variants={tagVariants}
+                                initial="hidden"
+                                animate={hoveredCategory === `rec-${categoryIndex}` ? "visible" : "hidden"}
+                                whileHover="hover"
                               >
                                 {item}
-                              </span>
+                              </motion.span>
                             ))}
                           </div>
-                          <p className="text-sm text-gray-600">{category.benefits}</p>
+                          <motion.p 
+                            className="text-sm text-gray-600"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            {category.benefits}
+                          </motion.p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <motion.div 
+              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={containerVariants}
+            >
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">❌ Foods to Avoid</h3>
+                <motion.h3 
+                  className="text-2xl font-bold text-gray-900 mb-6 flex items-center"
+                  variants={titleVariants}
+                >
+                  <motion.span 
+                    className="text-2xl mr-2"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: [0, -15, 0, -15, 0] }}
+                    transition={{ duration: 1.5, delay: 1, repeat: Infinity, repeatDelay: 5 }}
+                  >
+                    ❌
+                  </motion.span>
+                  Foods to Avoid
+                </motion.h3>
                 <div className="space-y-6">
-                  {foodsToAvoid.map((category) => (
-                    <div key={category.category} className="bg-gray-50 rounded-lg p-4">
+                  {foodsToAvoid.map((category, categoryIndex) => (
+                    <motion.div 
+                      key={category.category} 
+                      className="bg-gray-50 rounded-lg p-4"
+                      variants={cardVariants}
+                      whileHover="hover"
+                      onHoverStart={() => setHoveredCategory(`avoid-${categoryIndex}`)}
+                      onHoverEnd={() => setHoveredCategory(null)}
+                    >
                       <h4 className="text-lg font-semibold text-gray-900">{category.category}</h4>
                       <div className="mt-2">
                         <div className="flex flex-wrap gap-2 mb-2">
-                          {category.items.map((item) => (
-                            <span
+                          {category.items.map((item, i) => (
+                            <motion.span
                               key={item}
                               className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium break-words bg-red-100 text-red-800"
+                              custom={i}
+                              variants={tagVariants}
+                              initial="hidden"
+                              animate={hoveredCategory === `avoid-${categoryIndex}` ? "visible" : "hidden"}
+                              whileHover="hover"
                             >
                               {item}
-                            </span>
+                            </motion.span>
                           ))}
                         </div>
-                        <p className="text-sm text-gray-600">{category.reason}</p>
+                        <motion.p 
+                          className="text-sm text-gray-600"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          {category.reason}
+                        </motion.p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div 
+            className="mt-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <p className="text-gray-500 italic">
+              Always consult with your healthcare provider about your specific nutritional needs during pregnancy.
+            </p>
+          </motion.div>
         </div>
       </div>
     </div>

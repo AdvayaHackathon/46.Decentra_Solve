@@ -11,14 +11,17 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
+    "axios": "^1.8.4",
     "chart.js": "^4.4.8",
-    "framer-motion": "^12.6.3",
+    "ethers": "^6.13.5",
+    "framer-motion": "^12.6.5",
     "front": "file:",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.5.0"
+    "react-router-dom": "^7.5.0",
+    "recharts": "^2.15.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
